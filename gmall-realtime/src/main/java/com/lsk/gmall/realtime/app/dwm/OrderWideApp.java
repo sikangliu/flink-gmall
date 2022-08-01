@@ -1,4 +1,4 @@
-package com.lsk.gmall.realtime.dwm;
+package com.lsk.gmall.realtime.app.dwm;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
