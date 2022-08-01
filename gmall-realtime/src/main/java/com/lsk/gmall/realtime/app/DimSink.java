@@ -2,6 +2,7 @@ package com.lsk.gmall.realtime.app;
 
 import com.alibaba.fastjson.JSONObject;
 import com.lsk.gmall.realtime.common.GmallConfig;
+import com.lsk.gmall.realtime.utils.DimUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
@@ -43,6 +44,13 @@ public class DimSink extends RichSinkFunction<JSONObject> {
             preparedStatement.executeUpdate();
             //提交
             connection.commit();
+            //判断如果为更新数据,则删除 Redis 中数据
+            if ("update".equals(jsonObject.getString("type"))) {
+                String sourceTable = jsonObject.getString("table");
+                String value = jsonObject.getJSONObject("data").getString("id");
+                String key = sourceTable + ":" + value;
+                DimUtil.deleteCached(key);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("插入 Phoenix 数据失败！");
